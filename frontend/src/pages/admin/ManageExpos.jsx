@@ -6,6 +6,15 @@ const CITIES = [
     'Karachi', 'Lahore', 'Islamabad', 'Multan', 'Quetta',
     'Hyderabad', 'Faisalabad', 'Rawalpindi', 'Gujranwala', 'Peshawar'
 ];
+
+// ✅ Theme dropdown options
+const THEMES = [
+    'Technology', 'Healthcare', 'Education', 'Finance',
+    'Retail', 'Food & Beverage', 'Fashion', 'Automobile',
+    'Real Estate', 'Sports', 'Agriculture', 'Construction',
+    'Tourism', 'Entertainment', 'Industrial', 'Other'
+];
+
 const today = new Date().toISOString().split('T')[0];
 
 const ManageExpos = () => {
@@ -14,7 +23,6 @@ const ManageExpos = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingExpo, setEditingExpo] = useState(null);
 
-    // ── Delete confirmation state ──
     const [deleteModal, setDeleteModal] = useState({ open: false, expoId: null, expoTitle: '' });
     const [deleting, setDeleting] = useState(false);
 
@@ -23,7 +31,6 @@ const ManageExpos = () => {
         startDate: '', endDate: '', theme: '',
         status: 'draft', maxBooths: 50,
         registrationDeadline: '',
-        // Ticket Settings
         ticketsEnabled: false,
         totalTickets: 100,
         ticketPrices: { general: 0, vip: 0, student: 0 }
@@ -95,7 +102,6 @@ const ManageExpos = () => {
             status: expo.status,
             maxBooths: expo.maxBooths,
             registrationDeadline: expo.registrationDeadline?.split('T')[0] || '',
-            // Ticket Settings
             ticketsEnabled: expo.ticketsEnabled || false,
             totalTickets: expo.totalTickets || 100,
             ticketPrices: expo.ticketPrices || { general: 0, vip: 0, student: 0 }
@@ -184,7 +190,7 @@ const ManageExpos = () => {
         input: { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '14px', color: '#0f172a', outline: 'none', transition: 'all 0.2s', background: '#f8fafc', boxSizing: 'border-box', marginBottom: '16px', fontFamily: 'inherit' },
         inputDisabled: { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '14px', color: '#94a3b8', outline: 'none', background: '#f1f5f9', boxSizing: 'border-box', marginBottom: '16px', fontFamily: 'inherit', cursor: 'not-allowed' },
         textarea: { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '14px', color: '#0f172a', outline: 'none', transition: 'all 0.2s', background: '#f8fafc', boxSizing: 'border-box', marginBottom: '16px', fontFamily: 'inherit', resize: 'vertical' },
-        select: { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '14px', color: '#0f172a', outline: 'none', background: '#f8fafc', boxSizing: 'border-box', marginBottom: '16px', cursor: 'pointer' },
+        select: { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: '10px', fontSize: '14px', color: '#0f172a', outline: 'none', background: '#f8fafc', boxSizing: 'border-box', marginBottom: '16px', cursor: 'pointer', appearance: 'auto', WebkitAppearance: 'auto' },
         grid2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' },
         modalBtnRow: { display: 'flex', gap: '10px', marginTop: '8px' },
         submitBtn: { flex: 1, padding: '12px', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', border: 'none', borderRadius: '10px', color: 'white', fontSize: '14px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(99,102,241,0.3)' },
@@ -197,7 +203,6 @@ const ManageExpos = () => {
             color: days <= 3 ? '#dc2626' : days <= 7 ? '#d97706' : '#059669',
             border: `1px solid ${days <= 3 ? 'rgba(239,68,68,0.3)' : days <= 7 ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.3)'}`,
         }),
-        // Ticket Settings Styles
         ticketSection: { marginTop: '24px', padding: '20px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' },
         ticketSectionTitle: { fontSize: '14px', fontWeight: '800', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' },
         toggleRow: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' },
@@ -223,9 +228,7 @@ const ManageExpos = () => {
                     .expo-modal-grid2 { grid-template-columns: 1fr !important; }
                     .price-grid-3 { grid-template-columns: 1fr !important; }
                 }
-                .del-modal-enter {
-                    animation: delModalIn 0.2s ease;
-                }
+                .del-modal-enter { animation: delModalIn 0.2s ease; }
                 @keyframes delModalIn {
                     from { opacity: 0; transform: scale(0.92) translateY(10px); }
                     to   { opacity: 1; transform: scale(1)    translateY(0);    }
@@ -235,9 +238,7 @@ const ManageExpos = () => {
                     box-shadow: 0 8px 24px rgba(239,68,68,0.4) !important;
                     transform: translateY(-1px);
                 }
-                .del-cancel-btn:hover {
-                    background: #e2e8f0 !important;
-                }
+                .del-cancel-btn:hover { background: #e2e8f0 !important; }
             `}</style>
 
             {/* DELETE CONFIRMATION MODAL */}
@@ -333,15 +334,22 @@ const ManageExpos = () => {
                                             ))}
                                         </select>
                                     </div>
+
+                                    {/* ✅ Theme - Dropdown */}
                                     <div>
-                                        <label style={s.label}>Theme</label>
-                                        <input type="text" value={formData.theme}
+                                        <label style={s.label}>🎯 Theme</label>
+                                        <select value={formData.theme}
                                             onChange={e => setFormData({ ...formData, theme: e.target.value })}
-                                            placeholder="e.g. Technology 2026"
-                                            style={s.input} onFocus={focusInput} onBlur={blurInput}
-                                        />
+                                            style={s.select} onFocus={focusInput} onBlur={blurInput}
+                                        >
+                                            <option value="">Select Theme...</option>
+                                            {THEMES.map(theme => (
+                                                <option key={theme} value={theme}>{theme}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
+
                                 <div style={s.grid2} className="expo-modal-grid2">
                                     <div>
                                         <label style={s.label}>📅 Start Date</label>
@@ -364,6 +372,7 @@ const ManageExpos = () => {
                                         )}
                                     </div>
                                 </div>
+
                                 <label style={s.label}>⏰ Registration Deadline</label>
                                 {!formData.startDate || !formData.endDate ? (
                                     <div style={s.inputDisabled}>Select start & end date first</div>
@@ -377,6 +386,7 @@ const ManageExpos = () => {
                                 <div style={s.hint}>
                                     ℹ️ Deadline must be between start and end date. Attendees & exhibitors get email reminders as deadline approaches.
                                 </div>
+
                                 <div style={s.grid2} className="expo-modal-grid2">
                                     <div>
                                         <label style={s.label}>Status</label>
@@ -400,13 +410,11 @@ const ManageExpos = () => {
                                     </div>
                                 </div>
 
-                                {/* ========== TICKET SETTINGS SECTION ========== */}
+                                {/* TICKET SETTINGS */}
                                 <div style={s.ticketSection}>
                                     <div style={s.ticketSectionTitle}>
                                         <span>🎟️</span> Ticket Settings
                                     </div>
-                                    
-                                    {/* Toggle Enable/Disable Tickets */}
                                     <div style={s.toggleRow}>
                                         <button type="button" style={s.toggle(formData.ticketsEnabled)}
                                             onClick={() => setFormData(prev => ({ ...prev, ticketsEnabled: !prev.ticketsEnabled }))}
@@ -422,21 +430,19 @@ const ManageExpos = () => {
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Total Tickets */}
                                     <label style={s.label}>Total Tickets Available</label>
                                     <input type="number" value={formData.totalTickets} min="1"
                                         onChange={e => setFormData(prev => ({ ...prev, totalTickets: parseInt(e.target.value) || 0 }))}
                                         style={s.input} onFocus={focusInput} onBlur={blurInput}
                                         disabled={!formData.ticketsEnabled}
                                     />
-
-                                    {/* Ticket Prices */}
                                     <label style={s.label}>Ticket Prices (PKR) — 0 = Free</label>
                                     <div style={s.priceGrid} className="price-grid-3">
                                         {['general', 'vip', 'student'].map(type => (
                                             <div key={type} style={s.priceBox}>
-                                                <div style={s.priceLabel}>{type === 'general' ? '🎟️ General' : type === 'vip' ? '⭐ VIP' : '🎓 Student'}</div>
+                                                <div style={s.priceLabel}>
+                                                    {type === 'general' ? '🎟️ General' : type === 'vip' ? '⭐ VIP' : '🎓 Student'}
+                                                </div>
                                                 <input type="number" min="0"
                                                     value={formData.ticketPrices[type]}
                                                     onChange={e => setFormData(prev => ({
@@ -451,7 +457,6 @@ const ManageExpos = () => {
                                         ))}
                                     </div>
                                 </div>
-                                {/* ========== END TICKET SETTINGS ========== */}
 
                                 <div style={s.modalBtnRow}>
                                     <button type="submit" style={s.submitBtn}
@@ -497,7 +502,11 @@ const ManageExpos = () => {
                                         <div>
                                             <p style={s.expoTitle}>
                                                 {expo.title}
-                                                {expo.ticketsEnabled && <span style={{ marginLeft: '8px', fontSize: '10px', color: '#059669', background: 'rgba(16,185,129,0.1)', padding: '2px 6px', borderRadius: '20px' }}>🎟️ Tickets Enabled</span>}
+                                                {expo.ticketsEnabled && (
+                                                    <span style={{ marginLeft: '8px', fontSize: '10px', color: '#059669', background: 'rgba(16,185,129,0.1)', padding: '2px 6px', borderRadius: '20px' }}>
+                                                        🎟️ Tickets Enabled
+                                                    </span>
+                                                )}
                                             </p>
                                             {expo.theme && <p style={s.expoTheme}>🎯 {expo.theme}</p>}
                                         </div>

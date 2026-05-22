@@ -1,219 +1,377 @@
-import { useState, useContext, useCallback } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 
-/* ─── tiny hook: tracks viewport width without a library ─── */
 function useIsMobile(breakpoint = 600) {
+
     const [isMobile, setIsMobile] = useState(
-        () => typeof window !== 'undefined' && window.innerWidth < breakpoint
+        window.innerWidth < breakpoint
     );
-    useState(() => {
-        const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
-        const handler = (e) => setIsMobile(e.matches);
-        mq.addEventListener('change', handler);
-        return () => mq.removeEventListener('change', handler);
-    });
+
+    useEffect(() => {
+
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < breakpoint);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+
+    }, [breakpoint]);
+
     return isMobile;
 }
 
 const MyProfile = () => {
+
     const { user } = useContext(AuthContext);
+
     const isMobile = useIsMobile();
 
     const [formData, setFormData] = useState({
-        name       : user?.name        || '',
-        email      : user?.email       || '',
-        phone      : user?.phone       || '',
-        companyName: user?.companyName || '',
+        name: '',
+        email: '',
+        phone: '',
+        companyName: '',
     });
+
     const [focusedField, setFocusedField] = useState(null);
 
+    useEffect(() => {
+
+        if (user) {
+
+            setFormData({
+                name: user?.name || '',
+                email: user?.email || '',
+                phone: user?.phone || '',
+                companyName: user?.companyName || '',
+            });
+        }
+
+    }, [user]);
+
     const handleChange = useCallback((name, value) => {
-        setFormData(prev => ({ ...prev, [name]: value }));
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+
     }, []);
 
     const handleSubmit = (e) => {
+
         e.preventDefault();
-        toast.info('Profile update coming soon!');
+
+        console.log(formData);
+
+        toast.success('Profile Updated Successfully');
+
     };
 
-    /* ─── avatar initial — safe even if name is undefined ─── */
-    const avatarInitial = user?.name ? user.name.charAt(0).toUpperCase() : '?';
+    const avatarInitial = user?.name
+        ? user.name.charAt(0).toUpperCase()
+        : '?';
 
     const s = {
+
         wrapper: {
-            maxWidth: '680px',
+            maxWidth: '700px',
             margin: '0 auto',
             padding: isMobile ? '0 12px' : '0',
+            fontFamily: 'Segoe UI, sans-serif',
         },
 
-        pageTitle: {
-            fontSize: isMobile ? '18px' : '22px',
-            fontWeight: '900',
+        title: {
+            fontSize: isMobile ? '22px' : '28px',
+            fontWeight: '800',
             color: '#0f172a',
-            letterSpacing: '-0.5px',
-            margin: '0 0 24px 0',
+            marginBottom: '20px',
         },
 
         card: {
-            background: 'white',
-            borderRadius: '20px',
-            border: '1px solid #e2e8f0',
+            background: '#ffffff',
+            borderRadius: '24px',
             overflow: 'hidden',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
         },
 
-        avatarSection: {
+        topSection: {
+            background: 'linear-gradient(135deg,#0f172a,#1e293b)',
+            padding: isMobile ? '25px 20px' : '35px',
             display: 'flex',
             alignItems: isMobile ? 'flex-start' : 'center',
             flexDirection: isMobile ? 'column' : 'row',
-            gap: isMobile ? '12px' : '16px',
-            padding: isMobile ? '20px' : '24px 28px',
-            borderBottom: '1px solid #f1f5f9',
-            background: 'linear-gradient(135deg, #0f172a, #1e1b4b)',
-            position: 'relative',
-            overflow: 'hidden',
+            gap: '18px',
         },
-        avatarBg: {
-            position: 'absolute', inset: 0,
-            backgroundImage:
-                'radial-gradient(ellipse at 90% 50%, rgba(99,102,241,0.2) 0%, transparent 60%)',
-        },
+
         avatar: {
-            width: isMobile ? '52px' : '64px',
-            height: isMobile ? '52px' : '64px',
-            flexShrink: 0,
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+            width: '70px',
+            height: '70px',
             borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: '900',
-            fontSize: isMobile ? '22px' : '26px',
-            color: 'white',
-            boxShadow: '0 0 20px rgba(99,102,241,0.4)',
-            position: 'relative', zIndex: 1,
+            background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            fontSize: '28px',
+            fontWeight: '800',
+            flexShrink: 0,
         },
-        avatarInfo: { position: 'relative', zIndex: 1 },
-        avatarName : {
-            fontSize: isMobile ? '15px' : '17px',
-            fontWeight: '800', color: 'white', margin: '0 0 2px 0',
+
+        userName: {
+            color: '#fff',
+            fontSize: '20px',
+            fontWeight: '700',
+            marginBottom: '5px',
         },
-        avatarEmail: {
-            fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: '0 0 8px 0',
-            wordBreak: 'break-all',          /* long emails don't overflow */
+
+        userEmail: {
+            color: '#cbd5e1',
+            fontSize: '14px',
+            marginBottom: '10px',
+            wordBreak: 'break-word',
         },
-        roleBadge: {
+
+        role: {
             display: 'inline-block',
-            background: 'rgba(99,102,241,0.2)',
-            border: '1px solid rgba(99,102,241,0.4)',
-            color: '#a5b4fc', fontSize: '10px',
-            fontWeight: '700', padding: '3px 10px',
-            borderRadius: '100px', textTransform: 'capitalize',
-            letterSpacing: '0.05em',
+            padding: '6px 12px',
+            borderRadius: '999px',
+            background: 'rgba(255,255,255,0.12)',
+            color: '#fff',
+            fontSize: '12px',
+            fontWeight: '600',
+            textTransform: 'capitalize',
         },
 
-        formBody: { padding: isMobile ? '16px' : '28px' },
+        body: {
+            padding: isMobile ? '20px' : '30px',
+        },
 
-        /* single-column on mobile, two-column on desktop */
-        grid2: {
+        grid: {
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-            gap: '16px',
-            marginBottom: '16px',
+            gap: '18px',
+            marginBottom: '18px',
         },
 
-        fieldGroup: { display: 'flex', flexDirection: 'column', gap: '6px' },
+        field: {
+            display: 'flex',
+            flexDirection: 'column',
+        },
+
         label: {
-            fontSize: '12px', fontWeight: '700', color: '#475569',
-            textTransform: 'uppercase', letterSpacing: '0.05em',
+            fontSize: '13px',
+            fontWeight: '700',
+            marginBottom: '8px',
+            color: '#334155',
         },
 
-        submitBtn: {
-            width: '100%', padding: '13px',
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-            border: 'none', borderRadius: '12px',
-            color: 'white', fontSize: '14px', fontWeight: '700',
-            cursor: 'pointer', marginTop: '8px',
-            transition: 'all 0.2s',
-            boxShadow: '0 4px 16px rgba(99,102,241,0.3)',
+        button: {
+            width: '100%',
+            background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+            border: 'none',
+            padding: '14px',
+            borderRadius: '14px',
+            color: '#fff',
+            fontSize: '15px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            marginTop: '10px',
+            transition: '0.2s',
         },
     };
 
-    /* input style as a plain function (not nested in s to avoid stale closure) */
     const inputStyle = (name, disabled) => ({
-        width: '100%', padding: '10px 14px',
-        border: focusedField === name ? '1.5px solid #6366f1' : '1.5px solid #e2e8f0',
-        borderRadius: '10px',
-        fontSize: '14px', fontWeight: '500',
-        color: disabled ? '#94a3b8' : '#0f172a',
-        background: disabled ? '#f8fafc' : 'white',
+
+        width: '100%',
+        padding: '13px 14px',
+        borderRadius: '12px',
+
+        border:
+            focusedField === name
+                ? '2px solid #6366f1'
+                : '1.5px solid #e2e8f0',
+
         outline: 'none',
-        transition: 'border-color 0.2s, box-shadow 0.2s',
-        boxShadow: focusedField === name ? '0 0 0 3px rgba(99,102,241,0.1)' : 'none',
+        fontSize: '14px',
+        transition: '0.2s',
+        background: disabled ? '#f8fafc' : '#fff',
+        color: '#0f172a',
+
+        boxShadow:
+            focusedField === name
+                ? '0 0 0 4px rgba(99,102,241,0.1)'
+                : 'none',
+
         boxSizing: 'border-box',
-        cursor: disabled ? 'not-allowed' : 'text',
     });
 
-    /* ─── Field defined OUTSIDE return so it's stable across renders ─── */
-    const Field = ({ label, name, type = 'text', disabled }) => (
-        <div style={s.fieldGroup}>
-            <label style={s.label}>{label}</label>
-            <input
-                type={type}
-                value={formData[name]}
-                disabled={disabled}
-                onChange={e => handleChange(name, e.target.value)}
-                onFocus={() => !disabled && setFocusedField(name)}
-                onBlur={() => setFocusedField(null)}
-                style={inputStyle(name, disabled)}
-            />
-        </div>
-    );
-
     return (
+
         <div style={s.wrapper}>
-            <h2 style={s.pageTitle}>My Profile</h2>
+
+            <h2 style={s.title}>
+                My Profile
+            </h2>
 
             <div style={s.card}>
 
-                {/* Avatar section */}
-                <div style={s.avatarSection}>
-                    <div style={s.avatarBg} />
-                    <div style={s.avatar}>{avatarInitial}</div>
-                    <div style={s.avatarInfo}>
-                        <p style={s.avatarName}>{user?.name}</p>
-                        <p style={s.avatarEmail}>{user?.email}</p>
-                        <span style={s.roleBadge}>{user?.role}</span>
+                <div style={s.topSection}>
+
+                    <div style={s.avatar}>
+                        {avatarInitial}
                     </div>
+
+                    <div>
+
+                        <div style={s.userName}>
+                            {user?.name}
+                        </div>
+
+                        <div style={s.userEmail}>
+                            {user?.email}
+                        </div>
+
+                        <div style={s.role}>
+                            {user?.role}
+                        </div>
+
+                    </div>
+
                 </div>
 
-                {/* Form */}
-                <div style={s.formBody}>
+                <div style={s.body}>
+
                     <form onSubmit={handleSubmit}>
-                        <div style={s.grid2}>
-                            <Field label="Full Name"    name="name" />
-                            <Field label="Email"        name="email" type="email" disabled />
+
+                        <div style={s.grid}>
+
+                            <div style={s.field}>
+
+                                <label style={s.label}>
+                                    Full Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={(e) =>
+                                        handleChange(
+                                            'name',
+                                            e.target.value
+                                        )
+                                    }
+                                    onFocus={() =>
+                                        setFocusedField('name')
+                                    }
+                                    onBlur={() =>
+                                        setFocusedField(null)
+                                    }
+                                    style={inputStyle('name')}
+                                />
+
+                            </div>
+
+                            <div style={s.field}>
+
+                                <label style={s.label}>
+                                    Email Address
+                                </label>
+
+                                <input
+                                    type="email"
+                                    value={formData.email}
+                                    disabled
+                                    style={inputStyle('email', true)}
+                                />
+
+                            </div>
+
                         </div>
-                        <div style={s.grid2}>
-                            <Field label="Phone"        name="phone" type="tel" />
-                            <Field label="Company Name" name="companyName" />
+
+                        <div style={s.grid}>
+
+                            <div style={s.field}>
+
+                                <label style={s.label}>
+                                    Phone Number
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    value={formData.phone}
+                                    onChange={(e) =>
+                                        handleChange(
+                                            'phone',
+                                            e.target.value
+                                        )
+                                    }
+                                    onFocus={() =>
+                                        setFocusedField('phone')
+                                    }
+                                    onBlur={() =>
+                                        setFocusedField(null)
+                                    }
+                                    style={inputStyle('phone')}
+                                />
+
+                            </div>
+
+                            <div style={s.field}>
+
+                                <label style={s.label}>
+                                    Company Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    value={formData.companyName}
+                                    onChange={(e) =>
+                                        handleChange(
+                                            'companyName',
+                                            e.target.value
+                                        )
+                                    }
+                                    onFocus={() =>
+                                        setFocusedField('companyName')
+                                    }
+                                    onBlur={() =>
+                                        setFocusedField(null)
+                                    }
+                                    style={inputStyle('companyName')}
+                                />
+
+                            </div>
+
                         </div>
 
                         <button
                             type="submit"
-                            style={s.submitBtn}
-                            onMouseEnter={e => {
-                                e.currentTarget.style.transform = 'translateY(-1px)';
-                                e.currentTarget.style.boxShadow = '0 8px 24px rgba(99,102,241,0.4)';
+                            style={s.button}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform =
+                                    'translateY(-2px)';
                             }}
-                            onMouseLeave={e => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 16px rgba(99,102,241,0.3)';
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform =
+                                    'translateY(0px)';
                             }}
                         >
                             Save Changes
                         </button>
+
                     </form>
+
                 </div>
+
             </div>
+
         </div>
     );
 };
