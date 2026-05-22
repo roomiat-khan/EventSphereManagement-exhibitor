@@ -121,10 +121,7 @@ const Home = () => {
                             Where Great<br />
                             <span style={styles.heroTitleAccent}>Events Come to Life</span>
                         </h1>
-                        <p style={styles.heroSubtext}>
-                            The ultimate platform for organizers, exhibitors, and attendees<br />
-                            to connect, engage, and create unforgettable experiences.
-                        </p>
+                        
                         <div className="hero-buttons" style={styles.heroButtons}>
                             {!user ? (
                                 <>
